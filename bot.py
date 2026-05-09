@@ -19,20 +19,16 @@ def search_music(message):
         'extract_flat': True
     }
 
-   with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    result = ydl.extract_info(f"ytsearch1:{query}", download=False)
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.extract_info(f"ytsearch:{query}", download=False)
 
-    if 'entries' in result and len(result['entries']) > 0:
-        video = result['entries'][0]
+        if result['entries']:
+            video = result['entries'][0]
+            title = video['title']
+            url = f"https://www.youtube.com/watch?v={video['id']}"
 
-        title = video.get('title', 'Nomaʼlum')
-        url = video.get('webpage_url', '')
-
-        bot.reply_to(
-            message,
-            f"Topildi:\n\n{title}\n{url}"
-        )
-    else:
-        bot.reply_to(message, "Topilmadi!")
+            bot.reply_to(message, f"Topildi:\n{title}\n{url}")
+        else:
+            bot.reply_to(message, "Topilmadi!")
 
 bot.infinity_polling()
