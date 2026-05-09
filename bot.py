@@ -10,25 +10,33 @@ bot = telebot.TeleBot(TOKEN)
 def start(message):
     bot.reply_to(message, "Qoshiq nomini yubor!")
 
-@bot.message_handler(func=lambda m: True)
+@bot.message_handler(content_types=['text'])
 def search_music(message):
     query = message.text
 
+    if query.startswith("http") or query.startswith("/"):
+        return
+
     ydl_opts = {
         'quiet': True,
-        'extract_flat': True
+        'default_search': 'ytsearch',
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        result = ydl.extract_info(f"ytsearch:{query}", download=False)
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            result = ydl.extract_info(f"ytsearch5:{query} music", download=False)
 
-        if result['entries']:
-            video = result['entries'][0]
-            title = video['title']
-            url = f"https://www.youtube.com/watch?v={video['id']}"
+            if 'entries' in result and len(result['entries']) > 0:
+                video = result['entries'][0]
 
-            bot.reply_to(message, f"Topildi:\n{title}\n{url}")
-        else:
-            bot.reply_to(message, "Topilmadi!")
+                title = video.get('title', 'Nomaʼlum')
+                url = video.get('webpage_url', '')
+
+                bot.reply_to(message, f"🎵 Topildi:\n\n{title}\n{url}")
+            else:
+                bot.reply_to(message, "❌ Topilmadi! Boshqa nom yozib ko‘ring.")
+
+    except Exception as e:
+        bot.reply_to(message, "❌ Xatolik yuz berdi!")
 
 bot.infinity_polling()
