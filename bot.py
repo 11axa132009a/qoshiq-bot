@@ -2,8 +2,9 @@ import telebot
 import yt_dlp
 import os
 
-TOKEN = os.getenv("7840357321:AAEuO3GTA57zJVn1-eR-p31lG2raYHOJkbw")
+TOKEN = os.getenv("BOT_TOKEN")
 
+bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'])
 def start(message):
